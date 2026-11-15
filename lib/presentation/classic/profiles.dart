@@ -27,9 +27,11 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
     try {
       await task();
     } catch (error) {
-      if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
+      }
     }
   }
 
@@ -48,7 +50,7 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
           failures.add('${profile.realLabel}: $error');
         }
       }
-      if (mounted && failures.isNotEmpty)
+      if (mounted && failures.isNotEmpty) {
         await showDialog<void>(
           context: context,
           builder: (context) => AlertDialog(
@@ -64,6 +66,7 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
             ],
           ),
         );
+      }
     } finally {
       if (mounted) setState(() => _updating = false);
     }
@@ -160,8 +163,9 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
           cancel: l.cancel,
           confirm: l.delete,
         );
-        if (confirmed == true)
+        if (confirmed == true) {
           await _run(() => action.deleteProfile(profile.id));
+        }
     }
   }
 
@@ -243,9 +247,9 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
                                     profile.realLabel,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                 ),
                                 PopupMenuButton<String>(
@@ -383,11 +387,13 @@ class _ClassicProfileFormState extends ConsumerState<ClassicProfileForm> {
         }
       } else {
         final current = ref.read(profileProvider(old.id));
-        if (current == null)
+        if (current == null) {
           throw StateError(
-            AppLocalizations.of(context)
-                .nullTip(AppLocalizations.of(context).profile),
+            AppLocalizations.of(
+              context,
+            ).nullTip(AppLocalizations.of(context).profile),
           );
+        }
         final next = current.copyWith(
           label: _name.text.trim(),
           url: _url.text.trim(),
@@ -396,10 +402,11 @@ class _ClassicProfileFormState extends ConsumerState<ClassicProfileForm> {
           autoUpdateDuration: Duration(minutes: int.parse(_interval.text)),
         );
         if (next.url != current.url ||
-            next.ageSecretKey != current.ageSecretKey)
+            next.ageSecretKey != current.ageSecretKey) {
           await action.updateProfile(next);
-        else
+        } else {
           action.putProfile(next);
+        }
         ref.read(setupActionProvider.notifier).autoApplyProfile();
       }
       if (mounted) {
@@ -407,9 +414,11 @@ class _ClassicProfileFormState extends ConsumerState<ClassicProfileForm> {
         Navigator.pop(context);
       }
     } catch (error) {
-      if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
