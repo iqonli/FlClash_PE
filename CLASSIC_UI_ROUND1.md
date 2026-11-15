@@ -33,6 +33,13 @@ Open Tools → Theme → Interface style → Classic interface. The default rema
 
 Implementation review: business operations remain in existing providers/actions; the new layer owns rendering, route stacks and form state. Core and Prism gitlinks and database schema are unchanged.
 
+CI evidence from workflow [#43682094097](https://github.com/iqonli/FlClash_PE/actions/runs/43682094097) at source commit `3ab4c0d`:
+- All 4,882 Dart tests passed, with 6 skipped; format and static analysis passed.
+- All seven packaging jobs completed successfully: Android, Windows x64/ARM64, Linux x64/ARM64, and macOS Intel/ARM64. Separate desktop debug builds and Go/Rust/Android unit test jobs passed.
+- The overall measured coverage was 86.30%. The new `lib/presentation` directory measured 43.7%; its own 43% initial coverage floor is now tracked in `tool/check_coverage.dart`, without reducing any established group floor. The earlier workflow's red status was solely the absence of that new floor, not a test or compile failure.
+- Six viewport widths (360, 412, 600, 601, 800 and 1280 dp) were exercised with 18 synthetic-data preview images. These are rendering checks, not live-device tests.
+
+The outstanding manual acceptance checks are: install/upgrade, classic ↔ modern presentation toggling while the core is running, profile import/update, node changes and delay tests, Android VPN/TUN permissions, desktop system proxy/TUN, connection restoration, and perceived performance on real devices. No results for these have been claimed.
 
 The branch workflow generates localization and model code, formats it, commits generated output, analyzes the result, then checks and builds that exact generated SHA. Publishing a Release is not part of this workflow.
 
