@@ -103,9 +103,13 @@ class Dialogs {
     // from a scoped provider override.
     final dialogContext = context ?? _context;
     final hasProviderScope =
-        dialogContext.findAncestorWidgetOfExactType<UncontrolledProviderScope>() != null;
+        dialogContext
+            .findAncestorWidgetOfExactType<UncontrolledProviderScope>() !=
+        null;
     if (hasProviderScope &&
-        ProviderScope.containerOf(dialogContext).read(appSettingProvider).classicUi) {
+        ProviderScope.containerOf(
+          dialogContext,
+        ).read(appSettingProvider).classicUi) {
       final l = currentAppLocalizations;
       return showClassicMessage(
         context: dialogContext,
