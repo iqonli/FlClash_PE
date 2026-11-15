@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const classicGap = 14.0;
 const classicCardShape = RoundedSuperellipseBorder(
-  borderRadius: BorderRadius.all(Radius.circular(16)),
+  borderRadius: BorderRadius.all(Radius.circular(14)),
 );
 
 class ClassicCard extends StatelessWidget {
@@ -21,21 +21,23 @@ class ClassicCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Card.filled(
+    return Card.outlined(
       margin: EdgeInsets.zero,
-      shape: classicCardShape,
-      color: colors.secondaryContainer,
+      shape: classicCardShape.copyWith(
+        side: BorderSide(color: colors.surfaceContainerHighest),
+      ),
+      color: colors.surfaceContainerLow,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(icon, size: 20),
+                  Icon(icon, size: 20, color: colors.primary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -45,8 +47,8 @@ class ClassicCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
-              child,
+              const SizedBox(height: 8),
+              Expanded(child: child),
             ],
           ),
         ),

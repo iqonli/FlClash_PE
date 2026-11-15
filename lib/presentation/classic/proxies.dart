@@ -41,11 +41,9 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
         await action.delayTestGroups(groups);
       }
     } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
-      }
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -102,11 +100,10 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
             icon: const Icon(Icons.adjust),
             onPressed: () {
               final tabs = _tabsKey.currentState;
-              if (tabs != null) {
+              if (tabs != null)
                 tabs.locate(
                   ref.read(selectedProxyNameProvider(tabs.activeGroupName)),
                 );
-              }
             },
           ),
         IconButton(
@@ -221,9 +218,8 @@ class _ClassicGroupTabsState extends ConsumerState<_ClassicGroupTabs>
   }
 
   void _changed() {
-    if (!_controller.indexIsChanging) {
+    if (!_controller.indexIsChanging)
       widget.onSelected(widget.groups[_controller.index].name);
-    }
   }
 
   @override
@@ -334,10 +330,14 @@ class _ProxyTile extends ConsumerWidget {
         : delay < 800
         ? Colors.orange
         : colors.error;
-    return Card.filled(
+    return Card.outlined(
       margin: EdgeInsets.zero,
-      shape: classicCardShape,
-      color: selected ? colors.primaryContainer : colors.surfaceContainerHigh,
+      shape: classicCardShape.copyWith(
+        side: BorderSide(
+          color: selected ? colors.primary : colors.surfaceContainerHighest,
+        ),
+      ),
+      color: selected ? colors.secondaryContainer : colors.surfaceContainerLow,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => selectGroupProxy(
@@ -384,9 +384,8 @@ class _ProxyTile extends ConsumerWidget {
                           : delay <= 0
                           ? l.timeout
                           : '$delay ms',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelSmall?.copyWith(color: delayColor),
+                      style: Theme.of(context).textTheme.labelSmall
+                          ?.copyWith(color: delayColor),
                     ),
                 ],
               ),

@@ -42,11 +42,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           .read(setupActionProvider.notifier)
           .setRunning(!ref.read(isStartProvider));
     } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
-      }
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -75,48 +73,64 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           icon: const Icon(Icons.edit),
         ),
       ],
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: _busy || profile == null ? null : _toggle,
-        icon: _busy
+        tooltip: running ? l.stop : l.start,
+        child: _busy
             ? const SizedBox.square(
                 dimension: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : Icon(running ? Icons.stop : Icons.play_arrow),
-        label: Text(
-          _busy
-              ? l.connecting
-              : running
-              ? l.stop
-              : l.start,
-        ),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final columns = (constraints.maxWidth / 280).ceil().clamp(2, 8);
+          final scale = MediaQuery.textScalerOf(context)
+              .scale(1)
+              .clamp(1.0, 3.0);
           final width =
               (constraints.maxWidth - 32 - classicGap * (columns - 1)) /
               columns;
+          final offsets = List.filled(columns, 0.0);
+          final children = <Widget>[];
+          for (final id in order) {
+            final span = id == 'speed' ? 2 : 1;
+            var column = 0;
+            var top = double.infinity;
+            for (var i = 0; i <= columns - span; i++) {
+              final candidate = offsets
+                  .skip(i)
+                  .take(span)
+                  .reduce((a, b) => a > b ? a : b);
+              if (candidate < top) {
+                top = candidate;
+                column = i;
+              }
+            }
+            final height =
+                (['speed', 'mode', 'traffic'].contains(id) ? 174.0 : 100.0) *
+                scale;
+            children.add(
+              Positioned(
+                key: ValueKey(id),
+                left: column * (width + classicGap),
+                top: top,
+                width: width * span + classicGap * (span - 1),
+                height: height,
+                child: RepaintBoundary(child: _DashboardCard(id: id)),
+              ),
+            );
+            for (var i = column; i < column + span; i++) {
+              offsets[i] = top + height + classicGap;
+            }
+          }
+          final height = offsets.reduce((a, b) => a > b ? a : b);
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 104),
-            child: Wrap(
-              spacing: classicGap,
-              runSpacing: classicGap,
-              children: [
-                for (final id in order)
-                  SizedBox(
-                    key: ValueKey(id),
-                    height:
-                        180 *
-                        MediaQuery.textScalerOf(
-                          context,
-                        ).scale(1).clamp(1.0, 3.0),
-                    width: id == 'speed' && columns > 1
-                        ? width * 2 + classicGap
-                        : width,
-                    child: RepaintBoundary(child: _DashboardCard(id: id)),
-                  ),
-              ],
+            child: SizedBox(
+              height: height,
+              child: Stack(children: children),
             ),
           );
         },
@@ -192,19 +206,36 @@ class _DashboardCard extends ConsumerWidget {
         return ClassicCard(
           title: l.outboundMode,
           icon: Icons.alt_route,
-          child: Wrap(
-            spacing: 8,
-            children: [
-              for (final value in Mode.values)
-                ChoiceChip(
-                  label: Text(value.label),
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  selected: value == mode,
-                  onSelected: (_) =>
-                      ref.read(setupActionProvider.notifier).changeMode(value),
-                ),
-            ],
+          child: RadioGroup<Mode>(
+            groupValue: mode,
+            onChanged: (value) {
+              if (value != null)
+                ref.read(setupActionProvider.notifier).changeMode(value);
+            },
+            child: Column(
+              children: [
+                for (final value in Mode.values)
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => ref
+                          .read(setupActionProvider.notifier)
+                          .changeMode(value),
+                      child: Row(
+                        children: [
+                          Radio<Mode>(
+                            value: value,
+                            visualDensity: VisualDensity.compact,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(child: Text(value.label)),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         );
       case 'networkDetection':
@@ -229,11 +260,11 @@ class _DashboardCard extends ConsumerWidget {
             child: Switch(
               value: value,
               onChanged: (next) {
-                if (id == 'systemProxy') {
+                if (id == 'systemProxy')
                   ref
                       .read(networkSettingProvider.notifier)
                       .update((s) => s.copyWith(systemProxy: next));
-                } else if (id == 'vpn')
+                else if (id == 'vpn')
                   ref
                       .read(vpnSettingProvider.notifier)
                       .update((s) => s.copyWith(enable: next));
@@ -248,7 +279,6 @@ class _DashboardCard extends ConsumerWidget {
       case 'network':
         final ip = ref.watch(localIpProvider);
         final hidden = ref.watch(appSettingProvider.select((s) => s.hideIp));
-        final profile = ref.watch(currentProfileProvider);
         return ClassicCard(
           title: l.intranetIP,
           icon: Icons.devices,
@@ -257,10 +287,10 @@ class _DashboardCard extends ConsumerWidget {
             children: [
               SelectableText(
                 hidden ? '••••' : ip ?? l.connecting,
-                style: style,
+                style: Theme.of(context).textTheme.bodyMedium,
+                maxLines: 1,
               ),
               const SizedBox(height: 8),
-              Text(profile?.realLabel ?? l.nullProfileDesc),
             ],
           ),
         );

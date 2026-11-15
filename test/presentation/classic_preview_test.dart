@@ -21,6 +21,9 @@ import '../helpers/test_profiles.dart';
 
 void main() {
   setUpAll(() async {
+    await (FontLoader(
+      'MaterialIcons',
+    )..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
     final file = File('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf');
     if (await file.exists()) {
       final loader = FontLoader('ClassicPreviewSans')
