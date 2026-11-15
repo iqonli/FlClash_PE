@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fl_clash/presentation/classic/dialog.dart';
 import 'package:fl_clash/providers/config.dart';
-import 'package:fl_clash/state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/models/models.dart';
@@ -98,10 +98,17 @@ class Dialogs {
     bool? dismissible,
     bool destructive = false,
   }) async {
-    if (globalState.container.read(appSettingProvider).classicUi) {
+    // Resolve presentation settings from the dialog's widget tree. The global
+    // container is not initialized in isolated widget hosts, and it can differ
+    // from a scoped provider override.
+    final dialogContext = context ?? _context;
+    final hasProviderScope =
+        dialogContext.findAncestorWidgetOfExactType<UncontrolledProviderScope>() != null;
+    if (hasProviderScope &&
+        ProviderScope.containerOf(dialogContext).read(appSettingProvider).classicUi) {
       final l = currentAppLocalizations;
       return showClassicMessage(
-        context: context ?? _context,
+        context: dialogContext,
         message: message,
         title: title ?? l.tip,
         confirmText: confirmText ?? l.confirm,
