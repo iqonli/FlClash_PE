@@ -73,16 +73,15 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
       2 => PageLabel.profiles,
       4 || 5 => PageLabel.requests,
       6 => PageLabel.logs,
-      7 => PageLabel.dns,
+      7 => PageLabel.dnsQueries,
       8 => PageLabel.resources,
       _ => PageLabel.tools,
     });
   }
 
   Future<void> _back() async {
-    if (await (_keys[_index].currentState?.maybePop() ?? Future.value(false))) {
+    if (await (_keys[_index].currentState?.maybePop() ?? Future.value(false)))
       return;
-    }
     if (!mounted) return;
     if (MediaQuery.sizeOf(context).width <= 600 && _index >= 4) {
       _select(3);
@@ -110,7 +109,7 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
       l.requests,
       l.connections,
       l.logs,
-      l.dns,
+      l.dnsQueries,
       l.resources,
     ];
     const icons = [
@@ -284,7 +283,7 @@ class ClassicTools extends ConsumerWidget {
             ),
           ListTile(
             leading: const Icon(Icons.dns),
-            title: Text(l.dns),
+            title: Text(l.dnsQueries),
             onTap: () => onSelect(7),
           ),
           ListTile(

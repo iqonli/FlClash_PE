@@ -1080,5 +1080,6 @@
   "interfaceStyle": "界面风格",
   "classicInterface": "经典界面",
   "modernInterface": "新版界面",
-  "classicDashboardLayout": "仪表盘布局"
+  "classicDashboardLayout": "仪表盘布局",
+  "classicNetworkDetection": "网络检测"
 }
