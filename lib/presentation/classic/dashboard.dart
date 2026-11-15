@@ -1,4 +1,6 @@
 import 'package:fl_clash/common/common.dart' as app;
+import 'package:fl_clash/common/service_probe.dart' show routedOutbound;
+import 'package:fl_clash/providers/outbound_ip.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
@@ -8,7 +10,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'components.dart';
 
-const _cards = ['speed', 'mode', 'traffic', 'network', 'takeover'];
+const _cards = [
+  'speed',
+  'systemProxy',
+  'tun',
+  'vpn',
+  'mode',
+  'networkDetection',
+  'traffic',
+  'network',
+];
+
+bool _available(String id) => id != 'vpn' || app.system.isAndroid;
+bool _desktopCard(String id) =>
+    !app.system.isAndroid || (id != 'tun' && id != 'systemProxy');
 
 class ClassicDashboard extends ConsumerStatefulWidget {
   const ClassicDashboard({super.key});
@@ -28,9 +43,8 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           .setRunning(!ref.read(isStartProvider));
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -46,7 +60,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
     final profile = ref.watch(currentProfileProvider);
     final order = ref
         .watch(appSettingProvider.select((s) => s.classicDashboard))
-        .where(_cards.contains)
+        .where(
+          (id) => _cards.contains(id) && _available(id) && _desktopCard(id),
+        )
         .toList();
     return ClassicPage(
       title: l.dashboard,
@@ -75,11 +91,7 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final columns = constraints.maxWidth > 840
-              ? 3
-              : constraints.maxWidth > 560
-              ? 2
-              : 1;
+          final columns = (constraints.maxWidth / 280).ceil().clamp(2, 8);
           final width =
               (constraints.maxWidth - 32 - classicGap * (columns - 1)) /
               columns;
@@ -91,6 +103,12 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
               children: [
                 for (final id in order)
                   SizedBox(
+                    key: ValueKey(id),
+                    height:
+                        180 *
+                        MediaQuery.textScalerOf(context)
+                            .scale(1)
+                            .clamp(1.0, 3.0),
                     width: id == 'speed' && columns > 1
                         ? width * 2 + classicGap
                         : width,
@@ -116,16 +134,40 @@ class _DashboardCard extends ConsumerWidget {
       case 'speed':
         final traffic = ref.watch(trafficsProvider).list;
         final latest = traffic.isEmpty ? const Traffic() : traffic.last;
+        final color = Theme.of(context).colorScheme.primary;
         return ClassicCard(
           title: l.networkSpeed,
           icon: Icons.speed,
           child: Row(
             children: [
               Expanded(
-                child: Text('↑ ${classicBytes(latest.up)}/s', style: style),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('↑ ${classicBytes(latest.up)}/s', style: style),
+                    ClassicTrafficChart(
+                      values: [
+                        for (final sample in traffic) sample.up.toDouble(),
+                      ],
+                      color: color,
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 16),
               Expanded(
-                child: Text('↓ ${classicBytes(latest.down)}/s', style: style),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('↓ ${classicBytes(latest.down)}/s', style: style),
+                    ClassicTrafficChart(
+                      values: [
+                        for (final sample in traffic) sample.down.toDouble(),
+                      ],
+                      color: color,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -159,6 +201,44 @@ class _DashboardCard extends ConsumerWidget {
                       ref.read(setupActionProvider.notifier).changeMode(value),
                 ),
             ],
+          ),
+        );
+      case 'networkDetection':
+        return const _ClassicNetworkDetection();
+      case 'systemProxy':
+      case 'tun':
+      case 'vpn':
+        final value = id == 'systemProxy'
+            ? ref.watch(networkSettingProvider.select((s) => s.systemProxy))
+            : id == 'vpn'
+            ? ref.watch(vpnSettingProvider.select((s) => s.enable))
+            : ref.watch(patchClashConfigProvider.select((s) => s.tun.enable));
+        return ClassicCard(
+          title: id == 'systemProxy'
+              ? l.systemProxy
+              : id == 'vpn'
+              ? 'VPN'
+              : 'TUN',
+          icon: id == 'systemProxy' ? Icons.settings_ethernet : Icons.security,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Switch(
+              value: value,
+              onChanged: (next) {
+                if (id == 'systemProxy')
+                  ref
+                      .read(networkSettingProvider.notifier)
+                      .update((s) => s.copyWith(systemProxy: next));
+                else if (id == 'vpn')
+                  ref
+                      .read(vpnSettingProvider.notifier)
+                      .update((s) => s.copyWith(enable: next));
+                else
+                  ref
+                      .read(patchClashConfigProvider.notifier)
+                      .update((s) => s.copyWith.tun(enable: next));
+              },
+            ),
           ),
         );
       case 'network':
@@ -231,10 +311,20 @@ class ClassicDashboardEditor extends ConsumerWidget {
     final saved = ref.watch(
       appSettingProvider.select((s) => s.classicDashboard),
     );
-    final selected = saved.where(_cards.contains).toSet();
+    final selected = saved
+        .where(
+          (id) => _cards.contains(id) && _available(id) && _desktopCard(id),
+        )
+        .toSet();
     final order = [
-      ...saved.where(_cards.contains).toSet(),
-      ..._cards.where((id) => !selected.contains(id)),
+      ...saved
+          .where(
+            (id) => _cards.contains(id) && _available(id) && _desktopCard(id),
+          )
+          .toSet(),
+      ..._cards.where(
+        (id) => !selected.contains(id) && _available(id) && _desktopCard(id),
+      ),
     ];
     final labels = {
       'speed': l.networkSpeed,
@@ -242,6 +332,10 @@ class ClassicDashboardEditor extends ConsumerWidget {
       'traffic': l.trafficUsage,
       'network': l.intranetIP,
       'takeover': l.network,
+      'systemProxy': l.systemProxy,
+      'tun': 'TUN',
+      'vpn': 'VPN',
+      'networkDetection': l.network,
     };
     void save(List<String> value) => ref
         .read(appSettingProvider.notifier)
@@ -268,6 +362,58 @@ class ClassicDashboardEditor extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ClassicNetworkDetection extends ConsumerStatefulWidget {
+  const _ClassicNetworkDetection();
+  @override
+  ConsumerState<_ClassicNetworkDetection> createState() =>
+      _ClassicNetworkDetectionState();
+}
+
+class _ClassicNetworkDetectionState
+    extends ConsumerState<_ClassicNetworkDetection> {
+  late OutboundIpProbe _probe;
+  @override
+  void initState() {
+    super.initState();
+    _probe = ref.read(outboundIpProbeProvider.notifier)..watch(routedOutbound);
+  }
+
+  @override
+  void dispose() {
+    _probe.unwatch(routedOutbound);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(
+      outboundIpProbeProvider.select((s) => s.entryOf(routedOutbound)),
+    );
+    final l = AppLocalizations.of(context);
+    return ClassicCard(
+      title: l.network,
+      icon: Icons.network_check,
+      onTap: () => _probe.refresh(const [routedOutbound]),
+      child: state.isLoading
+          ? const SizedBox.square(
+              dimension: 22,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SelectableText(
+                  state.value?.ip ?? l.timeout,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 8),
+                Text(state.value?.countryCode ?? ''),
+              ],
+            ),
     );
   }
 }

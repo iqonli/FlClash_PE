@@ -1,5 +1,9 @@
 import 'dart:async';
 
+import 'package:fl_clash/presentation/classic/dialog.dart';
+import 'package:fl_clash/providers/config.dart';
+import 'package:fl_clash/state.dart';
+
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/widgets/widgets.dart';
@@ -94,6 +98,19 @@ class Dialogs {
     bool? dismissible,
     bool destructive = false,
   }) async {
+    if (globalState.container.read(appSettingProvider).classicUi) {
+      final l = currentAppLocalizations;
+      return showClassicMessage(
+        context: context ?? _context,
+        message: message,
+        title: title ?? l.tip,
+        confirmText: confirmText ?? l.confirm,
+        cancelText: cancelText ?? l.cancel,
+        cancelable: cancelable,
+        dismissible: dismissible ?? true,
+        destructive: destructive,
+      );
+    }
     return showCommonDialog<bool>(
       context: context,
       dismissible: dismissible,

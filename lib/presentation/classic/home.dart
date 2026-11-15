@@ -3,7 +3,6 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/views.dart' as modern;
-import 'package:fl_clash/views/theme.dart' as modern;
 import 'package:fl_clash/views/config/general.dart';
 import 'package:fl_clash/views/config/advanced.dart';
 import 'package:fl_clash/views/backup_and_restore.dart';
@@ -15,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'components.dart';
+import 'appearance.dart';
 import 'dashboard.dart';
 import 'proxies.dart';
 import 'profiles.dart';
@@ -269,7 +269,7 @@ class ClassicTools extends ConsumerWidget {
               ),
             ),
           ),
-          row(l.theme, Icons.palette_outlined, const modern.ThemeView()),
+          row(l.theme, Icons.palette_outlined, const ClassicAppearance()),
           row(
             l.backupAndRestore,
             Icons.cloud_sync_outlined,

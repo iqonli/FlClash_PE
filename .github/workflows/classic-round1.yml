@@ -44,18 +44,21 @@ jobs:
           dart run intl_utils:generate
           dart run build_runner build --delete-conflicting-outputs
           git checkout -- pubspec.yaml
-          dart format lib/presentation lib/application.dart lib/models/config.dart lib/views/theme.dart test/lint test/presentation
+          dart format lib/presentation lib/common/dialog.dart lib/application.dart lib/models/config.dart lib/views/theme.dart lib/l10n test/lint test/presentation
       - name: Save generated code
         id: result
         run: |
           git config user.name "IQ Online Studio"
           git config user.email "iqonli@disroot.org"
-          git add lib/models/generated lib/providers/generated lib/database/generated lib/l10n lib/presentation lib/application.dart lib/models/config.dart lib/views/theme.dart test/lint test/presentation
+          git add lib/models/generated lib/providers/generated lib/database/generated lib/l10n lib/presentation lib/application.dart lib/models/config.dart lib/views/theme.dart lib/common/dialog.dart test/lint test/presentation
           if ! git diff --cached --quiet; then
             git commit -m "build: regenerate classic presentation models and localization"
             git push origin HEAD:feature/classic-ui-round1
           fi
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Analyze classic integration
+        run: flutter analyze --no-fatal-infos
 
   dart:
     needs: generate

@@ -235,12 +235,46 @@ abstract class Filter with _$Filter {
   factory Filter.fromJson(Map<String, Object?> json) => _$FilterFromJson(json);
 }
 
+const defaultClassicDashboard = [
+  'speed',
+  'systemProxy',
+  'tun',
+  'mode',
+  'networkDetection',
+  'traffic',
+  'network',
+];
+
+Object? _readClassicDashboard(Map<dynamic, dynamic> json, String key) {
+  if (json.containsKey(key)) return json[key];
+  final old = json['dashboardWidgets'];
+  if (old is! List || old.contains('currentOutbound')) return null;
+  const names = {
+    'networkSpeed': 'speed',
+    'systemProxyButton': 'systemProxy',
+    'tunButton': 'tun',
+    'vpnButton': 'vpn',
+    'outboundMode': 'mode',
+    'outboundModeV2': 'mode',
+    'networkDetection': 'networkDetection',
+    'trafficUsage': 'traffic',
+    'intranetIp': 'network',
+  };
+  final items = [
+    for (final item in old)
+      if (names[item] != null) names[item]!,
+  ];
+  return items.isEmpty ? null : items.toSet().toList();
+}
+
 @freezed
 abstract class AppSettingProps with _$AppSettingProps {
   const factory AppSettingProps({
     String? locale,
     @Default(false) bool classicUi,
-    @Default(['speed', 'mode', 'traffic', 'network', 'takeover'])
+    @Default(1) int classicLayoutVersion,
+    @Default(defaultClassicDashboard)
+    @JsonKey(readValue: _readClassicDashboard)
     List<String> classicDashboard,
     @Default(defaultDashboardWidgets)
     @JsonKey(fromJson: dashboardWidgetsFromJson)

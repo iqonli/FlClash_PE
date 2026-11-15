@@ -115,3 +115,56 @@ String classicBytes(num value) {
   }
   return '${size.toStringAsFixed(index == 0 ? 0 : 1)} ${units[index]}';
 }
+
+class ClassicTrafficChart extends StatelessWidget {
+  const ClassicTrafficChart({
+    super.key,
+    required this.values,
+    required this.color,
+  });
+  final List<double> values;
+  final Color color;
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: 54,
+    width: double.infinity,
+    child: CustomPaint(painter: _TrafficPainter(values, color)),
+  );
+}
+
+class _TrafficPainter extends CustomPainter {
+  _TrafficPainter(this.values, this.color);
+  final List<double> values;
+  final Color color;
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (values.length < 2 || size.isEmpty) return;
+    final peak = values.fold<double>(1, (a, b) => a > b ? a : b);
+    final line = Path();
+    for (var i = 0; i < values.length; i++) {
+      final x = size.width * i / (values.length - 1);
+      final y = size.height * (1 - values[i] / peak);
+      if (i == 0) {
+        line.moveTo(x, y);
+      } else {
+        line.lineTo(x, y);
+      }
+    }
+    final area = Path.from(line)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(area, Paint()..color = color.withValues(alpha: 0.12));
+    canvas.drawPath(
+      line,
+      Paint()
+        ..color = color
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _TrafficPainter oldDelegate) =>
+      oldDelegate.values != values || oldDelegate.color != color;
+}
