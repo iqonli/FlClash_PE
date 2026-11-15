@@ -94,9 +94,9 @@ void main() {
         isFalse,
       );
       expect(container.read(appSettingProvider).dashboardWidgets, modern);
-      final json = jsonDecode(
-        jsonEncode(container.read(appSettingProvider)),
-      ) as Map<String, dynamic>;
+      final json =
+          jsonDecode(jsonEncode(container.read(appSettingProvider)))
+              as Map<String, dynamic>;
       expect(
         AppSettingProps.fromJson(json).classicDashboard.contains('speed'),
         isFalse,

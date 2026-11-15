@@ -42,9 +42,11 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           .read(setupActionProvider.notifier)
           .setRunning(!ref.read(isStartProvider));
     } catch (error) {
-      if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -86,9 +88,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final columns = (constraints.maxWidth / 280).ceil().clamp(2, 8);
-          final scale = MediaQuery.textScalerOf(context)
-              .scale(1)
-              .clamp(1.0, 3.0);
+          final scale = MediaQuery.textScalerOf(
+            context,
+          ).scale(1).clamp(1.0, 3.0);
           final width =
               (constraints.maxWidth - 32 - classicGap * (columns - 1)) /
               columns;
@@ -202,8 +204,9 @@ class _DashboardCard extends ConsumerWidget {
           child: RadioGroup<Mode>(
             groupValue: mode,
             onChanged: (value) {
-              if (value != null)
+              if (value != null) {
                 ref.read(setupActionProvider.notifier).changeMode(value);
+              }
             },
             child: Column(
               children: [
@@ -253,11 +256,11 @@ class _DashboardCard extends ConsumerWidget {
             child: Switch(
               value: value,
               onChanged: (next) {
-                if (id == 'systemProxy')
+                if (id == 'systemProxy') {
                   ref
                       .read(networkSettingProvider.notifier)
                       .update((s) => s.copyWith(systemProxy: next));
-                else if (id == 'vpn')
+                } else if (id == 'vpn')
                   ref
                       .read(vpnSettingProvider.notifier)
                       .update((s) => s.copyWith(enable: next));
