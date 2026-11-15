@@ -21,7 +21,6 @@ import '../helpers/test_profiles.dart';
 
 void main() {
   setUpAll(() async {
-    debugDisableShadows = false;
     await (FontLoader(
       'MaterialIcons',
     )..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
@@ -36,6 +35,7 @@ void main() {
     testWidgets('classic shell navigation and rendering at $width dp', (
       tester,
     ) async {
+      debugDisableShadows = false;
       tester.view.physicalSize = Size(width, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -135,6 +135,7 @@ void main() {
       expect(container.read(appSettingProvider).classicUi, isTrue);
       expect(container.read(currentProfileIdProvider), 1);
       await tester.pumpWidget(const SizedBox());
+      debugDisableShadows = true;
     });
   }
 }
