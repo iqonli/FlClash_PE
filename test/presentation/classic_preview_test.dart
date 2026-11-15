@@ -9,6 +9,10 @@ import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+
+import 'dart:typed_data';
+
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +20,14 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/test_profiles.dart';
 
 void main() {
+  setUpAll(() async {
+    final file = File('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf');
+    if (await file.exists()) {
+      final loader = FontLoader('ClassicPreviewSans')
+        ..addFont(Future.value(ByteData.sublistView(await file.readAsBytes())));
+      await loader.load();
+    }
+  });
   for (final width in [412.0, 1280.0]) {
     testWidgets('classic shell navigation and rendering at $width dp', (
       tester,
@@ -67,6 +79,7 @@ void main() {
             locale: const Locale('en'),
             theme: ThemeData(
               useMaterial3: true,
+              fontFamily: 'ClassicPreviewSans',
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
               navigationBarTheme: const NavigationBarThemeData(height: 80),
             ),

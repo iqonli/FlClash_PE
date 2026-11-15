@@ -45,13 +45,13 @@ jobs:
           dart run build_runner build --delete-conflicting-outputs
           git checkout -- pubspec.yaml
           dart fix --apply --code=curly_braces_in_flow_control_structures lib/presentation
-          dart format lib/presentation lib/common/dialog.dart lib/application.dart lib/models/config.dart lib/views/theme.dart lib/l10n test/lint test/presentation
+          dart format lib/presentation lib/common/dialog.dart lib/application.dart lib/models/config.dart lib/views/theme.dart lib/l10n test/lint test/presentation test/manager/core_manager_test.dart
       - name: Save generated code
         id: result
         run: |
           git config user.name "IQ Online Studio"
           git config user.email "iqonli@disroot.org"
-          git add pubspec.lock lib/models/generated lib/providers/generated lib/database/generated lib/l10n lib/presentation lib/application.dart lib/models/config.dart lib/views/theme.dart lib/common/dialog.dart test/lint test/presentation
+          git add pubspec.lock lib/models/generated lib/providers/generated lib/database/generated lib/l10n lib/presentation lib/application.dart lib/models/config.dart lib/views/theme.dart lib/common/dialog.dart test/lint test/presentation test/manager/core_manager_test.dart
           if ! git diff --cached --quiet; then
             git commit -m "build: regenerate classic presentation models and localization"
             git push origin HEAD:feature/classic-ui-round1
@@ -60,6 +60,18 @@ jobs:
 
       - name: Analyze classic integration
         run: flutter analyze --no-fatal-infos
+
+      - name: Exercise classic workflows
+        run: |
+          yq -i '.hooks.user_defines.setup.build_assets = false | .hooks.user_defines.rust_api.build_assets = false' pubspec.yaml
+          flutter test test/presentation test/manager/core_manager_test.dart --reporter expanded
+      - name: Upload layout previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: classic-layout-previews
+          path: test-output/classic-*.png
+          if-no-files-found: ignore
 
   dart:
     needs: generate

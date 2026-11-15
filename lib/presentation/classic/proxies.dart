@@ -1,4 +1,5 @@
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/common/l10n_labels.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -40,11 +41,9 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
         await action.delayTestGroups(groups);
       }
     } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
-      }
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -101,11 +100,10 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
             icon: const Icon(Icons.adjust),
             onPressed: () {
               final tabs = _tabsKey.currentState;
-              if (tabs != null) {
+              if (tabs != null)
                 tabs.locate(
                   ref.read(selectedProxyNameProvider(tabs.activeGroupName)),
                 );
-              }
             },
           ),
         IconButton(
@@ -220,9 +218,8 @@ class _ClassicGroupTabsState extends ConsumerState<_ClassicGroupTabs>
   }
 
   void _changed() {
-    if (!_controller.indexIsChanging) {
+    if (!_controller.indexIsChanging)
       widget.onSelected(widget.groups[_controller.index].name);
-    }
   }
 
   @override
@@ -383,9 +380,8 @@ class _ProxyTile extends ConsumerWidget {
                           : delay <= 0
                           ? l.timeout
                           : '$delay ms',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelSmall?.copyWith(color: delayColor),
+                      style: Theme.of(context).textTheme.labelSmall
+                          ?.copyWith(color: delayColor),
                     ),
                 ],
               ),
@@ -420,7 +416,7 @@ class ClassicProxySettings extends ConsumerWidget {
                 for (final type in ProxiesType.values)
                   ButtonSegment(
                     value: type,
-                    label: Text(type.name),
+                    label: Text(type.label),
                     icon: Icon(
                       type == ProxiesType.tab
                           ? Icons.view_carousel
@@ -465,7 +461,7 @@ class ClassicProxySettings extends ConsumerWidget {
           ClassicRadioChoices<ProxyCardType>(
             value: style.cardType,
             options: ProxyCardType.values,
-            label: (type) => type.name,
+            label: (type) => type.label,
             onChanged: (value) => update(style.copyWith(cardType: value)),
           ),
         ],
