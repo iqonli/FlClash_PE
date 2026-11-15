@@ -406,6 +406,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "classicInterface": MessageLookupByLibrary.simpleMessage(
       "Classic interface",
     ),
+    "classicNetworkDetection": MessageLookupByLibrary.simpleMessage("ネットワーク確認"),
     "clearData": MessageLookupByLibrary.simpleMessage("データを消去"),
     "clearDataAndExitTip": MessageLookupByLibrary.simpleMessage(
       "すべてのプロファイル、設定、ローカルデータを削除してアプリを終了します。もう一度開くと最初から始められます。",

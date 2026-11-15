@@ -9112,6 +9112,16 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Network detection`
+  String get classicNetworkDetection {
+    return Intl.message(
+      'Network detection',
+      name: 'classicNetworkDetection',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

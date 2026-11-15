@@ -382,6 +382,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "cipher": MessageLookupByLibrary.simpleMessage("加密方式"),
     "classicDashboardLayout": MessageLookupByLibrary.simpleMessage("仪表盘布局"),
     "classicInterface": MessageLookupByLibrary.simpleMessage("经典界面"),
+    "classicNetworkDetection": MessageLookupByLibrary.simpleMessage("网络检测"),
     "clearData": MessageLookupByLibrary.simpleMessage("清除数据"),
     "clearDataAndExitTip": MessageLookupByLibrary.simpleMessage(
       "将删除所有配置、设置和本地数据，随后关闭应用。重新打开即可从头开始。",

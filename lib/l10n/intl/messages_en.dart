@@ -473,6 +473,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "classicInterface": MessageLookupByLibrary.simpleMessage(
       "Classic interface",
     ),
+    "classicNetworkDetection": MessageLookupByLibrary.simpleMessage(
+      "Network detection",
+    ),
     "clearData": MessageLookupByLibrary.simpleMessage("Clear data"),
     "clearDataAndExitTip": MessageLookupByLibrary.simpleMessage(
       "This deletes all profiles, settings, and local data, then closes the app. Open it again to start fresh.",

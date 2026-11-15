@@ -493,6 +493,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "classicInterface": MessageLookupByLibrary.simpleMessage(
       "Classic interface",
     ),
+    "classicNetworkDetection": MessageLookupByLibrary.simpleMessage(
+      "Проверка сети",
+    ),
     "clearData": MessageLookupByLibrary.simpleMessage("Очистить данные"),
     "clearDataAndExitTip": MessageLookupByLibrary.simpleMessage(
       "Все профили, настройки и локальные данные будут удалены, после чего приложение закроется. Откройте его снова, чтобы начать заново.",
