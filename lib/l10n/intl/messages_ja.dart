@@ -400,6 +400,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "checkUpdate": MessageLookupByLibrary.simpleMessage("更新を確認"),
     "checkUpdateError": MessageLookupByLibrary.simpleMessage("すでに最新バージョンです"),
     "cipher": MessageLookupByLibrary.simpleMessage("暗号方式"),
+    "classicDashboardLayout": MessageLookupByLibrary.simpleMessage(
+      "Dashboard layout",
+    ),
+    "classicInterface": MessageLookupByLibrary.simpleMessage(
+      "Classic interface",
+    ),
+    "classicNetworkDetection": MessageLookupByLibrary.simpleMessage("ネットワーク確認"),
     "clearData": MessageLookupByLibrary.simpleMessage("データを消去"),
     "clearDataAndExitTip": MessageLookupByLibrary.simpleMessage(
       "すべてのプロファイル、設定、ローカルデータを削除してアプリを終了します。もう一度開くと最初から始められます。",
@@ -912,6 +919,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "interfaceNameModeClear": MessageLookupByLibrary.simpleMessage("クリア"),
     "interfaceNameModeCustom": MessageLookupByLibrary.simpleMessage("カスタム"),
     "interfaceNameModeFollow": MessageLookupByLibrary.simpleMessage("設定に従う"),
+    "interfaceStyle": MessageLookupByLibrary.simpleMessage("Interface style"),
     "internet": MessageLookupByLibrary.simpleMessage("インターネット"),
     "interval": MessageLookupByLibrary.simpleMessage("間隔"),
     "intranetIP": MessageLookupByLibrary.simpleMessage("イントラネットIP"),
@@ -1193,6 +1201,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "mitmTrustUntrusted": MessageLookupByLibrary.simpleMessage("完全には信頼されていません"),
     "mixedPort": MessageLookupByLibrary.simpleMessage("Mixedポート"),
     "mode": MessageLookupByLibrary.simpleMessage("モード"),
+    "modernInterface": MessageLookupByLibrary.simpleMessage("Modern interface"),
     "monochromeIcon": MessageLookupByLibrary.simpleMessage("モノクロームアイコン"),
     "monochromeScheme": MessageLookupByLibrary.simpleMessage("モノクローム"),
     "monthsAgo": m65,

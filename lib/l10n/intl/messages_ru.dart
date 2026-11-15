@@ -487,6 +487,15 @@ class MessageLookup extends MessageLookupByLibrary {
       "У вас уже последняя версия",
     ),
     "cipher": MessageLookupByLibrary.simpleMessage("Шифр"),
+    "classicDashboardLayout": MessageLookupByLibrary.simpleMessage(
+      "Dashboard layout",
+    ),
+    "classicInterface": MessageLookupByLibrary.simpleMessage(
+      "Classic interface",
+    ),
+    "classicNetworkDetection": MessageLookupByLibrary.simpleMessage(
+      "Проверка сети",
+    ),
     "clearData": MessageLookupByLibrary.simpleMessage("Очистить данные"),
     "clearDataAndExitTip": MessageLookupByLibrary.simpleMessage(
       "Все профили, настройки и локальные данные будут удалены, после чего приложение закроется. Откройте его снова, чтобы начать заново.",
@@ -1118,6 +1127,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "interfaceNameModeFollow": MessageLookupByLibrary.simpleMessage(
       "Как в конфигурации",
     ),
+    "interfaceStyle": MessageLookupByLibrary.simpleMessage("Interface style"),
     "internet": MessageLookupByLibrary.simpleMessage("Интернет"),
     "interval": MessageLookupByLibrary.simpleMessage("Интервал"),
     "intranetIP": MessageLookupByLibrary.simpleMessage("Внутренний IP"),
@@ -1467,6 +1477,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "mixedPort": MessageLookupByLibrary.simpleMessage("Смешанный порт"),
     "mode": MessageLookupByLibrary.simpleMessage("Режим"),
+    "modernInterface": MessageLookupByLibrary.simpleMessage("Modern interface"),
     "monochromeIcon": MessageLookupByLibrary.simpleMessage(
       "Монохромный значок",
     ),

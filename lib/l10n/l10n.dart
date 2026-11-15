@@ -9072,6 +9072,56 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Interface style`
+  String get interfaceStyle {
+    return Intl.message(
+      'Interface style',
+      name: 'interfaceStyle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Classic interface`
+  String get classicInterface {
+    return Intl.message(
+      'Classic interface',
+      name: 'classicInterface',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Modern interface`
+  String get modernInterface {
+    return Intl.message(
+      'Modern interface',
+      name: 'modernInterface',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dashboard layout`
+  String get classicDashboardLayout {
+    return Intl.message(
+      'Dashboard layout',
+      name: 'classicDashboardLayout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Network detection`
+  String get classicNetworkDetection {
+    return Intl.message(
+      'Network detection',
+      name: 'classicNetworkDetection',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

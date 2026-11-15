@@ -19,7 +19,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'pages/pages.dart';
+import 'presentation/host.dart';
 
 Widget buildManagerStack({
   required bool isDesktop,
@@ -156,6 +156,9 @@ class ApplicationState extends ConsumerState<Application> {
         );
         final themeProps = ref.watch(themeSettingProvider);
         final textScale = themeProps.textScale;
+        final classic = ref.watch(
+          appSettingProvider.select((s) => s.classicUi),
+        );
         return PrismApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: globalState.navigatorKey,
@@ -164,13 +167,15 @@ class ApplicationState extends ConsumerState<Application> {
             AppLocalizations.delegate,
             AppUiLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
           ],
           builder: (context, child) {
             return buildManagerStack(
               isDesktop: system.isDesktop,
               onConnectivityChanged: _handleConnectivityChanged,
               terminateSignals: _terminateSignals,
-              child: child!,
+              child: ClassicMaterialHost(child: child!),
             );
           },
           title: appName,
@@ -182,11 +187,13 @@ class ApplicationState extends ConsumerState<Application> {
           textScale: textScale.enable ? textScale.scale : null,
           minTextScale: minTextScale,
           maxTextScale: maxTextScale,
-          liquidGlass: switch (themeProps.liquidGlass) {
-            LiquidGlassMode.none => null,
-            LiquidGlassMode.ultra => LiquidGlassQuality.ultra,
-            LiquidGlassMode.standard => LiquidGlassQuality.standard,
-          },
+          liquidGlass: classic
+              ? null
+              : switch (themeProps.liquidGlass) {
+                  LiquidGlassMode.none => null,
+                  LiquidGlassMode.ultra => LiquidGlassQuality.ultra,
+                  LiquidGlassMode.standard => LiquidGlassQuality.standard,
+                },
           emojiFont: (family: FontFamily.twEmoji.value, pattern: emojiPattern),
           stackedBanners: !ref.watch(isMobileViewProvider),
           bannerTopInset: ref.watch(overlayTopOffsetProvider),
@@ -198,7 +205,7 @@ class ApplicationState extends ConsumerState<Application> {
           ),
         );
       },
-      child: const HomePage(),
+      child: const PresentationHome(),
     );
   }
 

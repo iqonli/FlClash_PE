@@ -301,6 +301,35 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('classic presentation and card layout do not reconfigure Core', (
+    tester,
+  ) async {
+    final setupAction = _ApplyRecordingSetupAction();
+    final core = _coreInterface();
+    final container = await _pumpCoreManager(
+      tester,
+      core,
+      overrides: [setupActionProvider.overrideWith(() => setupAction)],
+    );
+    container
+        .read(appSettingProvider.notifier)
+        .update(
+          (state) => state.copyWith(
+            classicUi: true,
+            classicDashboard: const ['traffic', 'mode'],
+          ),
+        );
+    await tester.pump();
+    container
+        .read(appSettingProvider.notifier)
+        .update((state) => state.copyWith(classicUi: false));
+    await tester.pump();
+    expect(setupAction.updates, 0);
+    expect(setupAction.applies, 0);
+    verifyNever(() => core.start());
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('a setting the Core patches live is not re-applied', (
     tester,
   ) async {

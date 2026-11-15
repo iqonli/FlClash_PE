@@ -80,3 +80,7 @@ Read these only when the task touches their area:
 Use repo skills from `.agents/skills/` when a task matches their descriptions; `.claude/skills/` symlinks expose the
 same skills to Claude Code. Current skills cover localization, UI work, UI performance, core/platform changes, and
 pre-commit structural quality review.
+
+## Classic presentation
+
+`lib/presentation/classic/` and its host implement the user-requested v0.8.94 Material presentation. They may import Material and use its icon, typography, shape and navigation APIs. Existing Prism rules remain binding elsewhere. Lifecycle, provider, input validation and resource ownership rules apply to both presentations.

@@ -1,4 +1,7 @@
 import 'dart:async';
+
+import 'package:fl_clash/presentation/host.dart';
+
 import 'dart:math';
 
 import 'package:fl_clash/common/common.dart';
@@ -27,6 +30,8 @@ class ThemeView extends StatelessWidget {
           bottom: 32 + context.bottomInset,
         ),
         children: [
+          const InterfaceStyleItem(),
+          const SizedBox(height: 16),
           const ThemeLivePreview(),
           const SizedBox(height: 16),
           const _ThemeModeItem(),
