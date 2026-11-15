@@ -19,7 +19,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'pages/pages.dart';
+import 'presentation/host.dart';
 
 Widget buildManagerStack({
   required bool isDesktop,
@@ -164,13 +164,15 @@ class ApplicationState extends ConsumerState<Application> {
             AppLocalizations.delegate,
             AppUiLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
           ],
           builder: (context, child) {
             return buildManagerStack(
               isDesktop: system.isDesktop,
               onConnectivityChanged: _handleConnectivityChanged,
               terminateSignals: _terminateSignals,
-              child: child!,
+              child: ClassicMaterialHost(child: child!),
             );
           },
           title: appName,
@@ -198,7 +200,7 @@ class ApplicationState extends ConsumerState<Application> {
           ),
         );
       },
-      child: const HomePage(),
+      child: const PresentationHome(),
     );
   }
 

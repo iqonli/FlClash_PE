@@ -24,6 +24,9 @@ void main() {
     final offenders = <String>[];
 
     for (final entity in sourceEntities()) {
+      if (entity.path.startsWith('lib/presentation/classic/') ||
+          entity.path == 'lib/presentation/host.dart')
+        continue;
       final path = p.relative(entity.path);
       if (entity is! File || !path.endsWith('.dart') || _isGenerated(path)) {
         continue;

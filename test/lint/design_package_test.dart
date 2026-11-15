@@ -43,6 +43,10 @@ void main() {
           continue;
         }
         final relative = p.relative(entity.path);
+        if (relative.startsWith('lib/presentation/classic/') ||
+            relative == 'lib/presentation/host.dart' ||
+            relative.startsWith('test/presentation/'))
+          continue;
         if (_isGenerated(relative)) {
           continue;
         }

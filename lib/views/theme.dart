@@ -1,4 +1,7 @@
 import 'dart:async';
+
+import 'package:fl_clash/presentation/host.dart';
+
 import 'dart:math';
 
 import 'package:fl_clash/common/common.dart';
@@ -27,6 +30,8 @@ class ThemeView extends StatelessWidget {
           bottom: 32 + context.bottomInset,
         ),
         children: [
+          const InterfaceStyleItem(),
+          const SizedBox(height: 16),
           const ThemeLivePreview(),
           const SizedBox(height: 16),
           const _ThemeModeItem(),
@@ -885,9 +890,9 @@ class _TextScaleFactorItemState extends ConsumerState<_TextScaleFactorItem> {
     final textScale = ref.watch(
       themeSettingProvider.select((state) => state.textScale),
     );
-    final systemScale = systemTextScaleOf(
-      context,
-    ).clamp(minTextScale, maxTextScale).toDouble();
+    final systemScale = systemTextScaleOf(context)
+        .clamp(minTextScale, maxTextScale)
+        .toDouble();
     final scale = _draft ?? (textScale.enable ? textScale.scale : systemScale);
     final percent = '${(scale * 100).round()}%';
     final level = context.raisedSurfaceLevel;

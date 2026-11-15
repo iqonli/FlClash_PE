@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'models.dart';
+
 import 'package:prism_ui/prism_ui.dart';
 
 part 'generated/config.freezed.dart';
@@ -238,6 +239,9 @@ abstract class Filter with _$Filter {
 abstract class AppSettingProps with _$AppSettingProps {
   const factory AppSettingProps({
     String? locale,
+    @Default(false) bool classicUi,
+    @Default(['speed', 'mode', 'traffic', 'network', 'takeover'])
+    List<String> classicDashboard,
     @Default(defaultDashboardWidgets)
     @JsonKey(fromJson: dashboardWidgetsFromJson)
     List<DashboardWidget> dashboardWidgets,
