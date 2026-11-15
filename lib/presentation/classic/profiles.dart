@@ -28,8 +28,9 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
       await task();
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -241,9 +242,9 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
                                     profile.realLabel,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleMedium,
                                   ),
                                 ),
                                 PopupMenuButton<String>(
@@ -367,8 +368,9 @@ class _ClassicProfileFormState extends ConsumerState<ClassicProfileForm> {
         final current = ref.read(profileProvider(old.id));
         if (current == null)
           throw StateError(
-            AppLocalizations.of(context)
-                .nullTip(AppLocalizations.of(context).profile),
+            AppLocalizations.of(
+              context,
+            ).nullTip(AppLocalizations.of(context).profile),
           );
         final next = current.copyWith(
           label: _name.text.trim(),
@@ -390,8 +392,9 @@ class _ClassicProfileFormState extends ConsumerState<ClassicProfileForm> {
       }
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

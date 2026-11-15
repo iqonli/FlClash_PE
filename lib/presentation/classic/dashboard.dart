@@ -28,8 +28,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           .setRunning(!ref.read(isStartProvider));
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

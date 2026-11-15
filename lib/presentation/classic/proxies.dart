@@ -39,8 +39,9 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
       }
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -58,8 +59,9 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
         : tab
         ? DefaultTabController(
             length: groups.length,
-            initialIndex: (groups.indexWhere((g) => g.name == _group))
-                .clamp(0, groups.length - 1),
+            initialIndex: (groups.indexWhere(
+              (g) => g.name == _group,
+            )).clamp(0, groups.length - 1),
             child: Column(
               children: [
                 TabBar(
@@ -268,8 +270,9 @@ class _ProxyTile extends ConsumerWidget {
                           : delay <= 0
                           ? l.timeout
                           : '$delay ms',
-                      style: Theme.of(context).textTheme.labelSmall
-                          ?.copyWith(color: delayColor),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelSmall?.copyWith(color: delayColor),
                     ),
                 ],
               ),

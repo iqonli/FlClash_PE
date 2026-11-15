@@ -7663,8 +7663,7 @@ class AppLocalizations {
   String customImportDroppedSubRules(num count, Object label) {
     return Intl.plural(
       count,
-      one:
-          '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
+      one: '1 SUB-RULE rule was dropped, since custom profiles do not support sub-rules',
       other:
           '$label SUB-RULE rules were dropped, since custom profiles do not support sub-rules',
       name: 'customImportDroppedSubRules',
@@ -9068,6 +9067,46 @@ class AppLocalizations {
     return Intl.message(
       'These domains are resolved by Fallback directly.',
       name: 'fallbackFilterDomainDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Interface style`
+  String get interfaceStyle {
+    return Intl.message(
+      'Interface style',
+      name: 'interfaceStyle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Classic interface`
+  String get classicInterface {
+    return Intl.message(
+      'Classic interface',
+      name: 'classicInterface',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Modern interface`
+  String get modernInterface {
+    return Intl.message(
+      'Modern interface',
+      name: 'modernInterface',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Dashboard layout`
+  String get classicDashboardLayout {
+    return Intl.message(
+      'Dashboard layout',
+      name: 'classicDashboardLayout',
       desc: '',
       args: [],
     );
