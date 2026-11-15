@@ -168,3 +168,30 @@ class _TrafficPainter extends CustomPainter {
   bool shouldRepaint(covariant _TrafficPainter oldDelegate) =>
       oldDelegate.values != values || oldDelegate.color != color;
 }
+
+class ClassicRadioChoices<T> extends StatelessWidget {
+  const ClassicRadioChoices({
+    super.key,
+    required this.value,
+    required this.options,
+    required this.label,
+    required this.onChanged,
+  });
+  final T value;
+  final List<T> options;
+  final String Function(T) label;
+  final ValueChanged<T> onChanged;
+  @override
+  Widget build(BuildContext context) => RadioGroup<T>(
+    groupValue: value,
+    onChanged: (next) {
+      if (next != null) onChanged(next);
+    },
+    child: Column(
+      children: [
+        for (final item in options)
+          RadioListTile<T>(value: item, title: Text(label(item))),
+      ],
+    ),
+  );
+}

@@ -44,6 +44,7 @@ jobs:
           dart run intl_utils:generate
           dart run build_runner build --delete-conflicting-outputs
           git checkout -- pubspec.yaml
+          dart fix --apply --code=curly_braces_in_flow_control_structures lib/presentation
           dart format lib/presentation lib/common/dialog.dart lib/application.dart lib/models/config.dart lib/views/theme.dart lib/l10n test/lint test/presentation
       - name: Save generated code
         id: result

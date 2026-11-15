@@ -24,6 +24,7 @@ class ClassicMaterialHost extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(themeSettingProvider);
+    final classic = ref.watch(appSettingProvider.select((s) => s.classicUi));
     final brightness = ref.watch(currentBrightnessProvider);
     final seed = settings.primaryColor == null
         ? ref.watch(dynamicColorProvider).accentColor
@@ -62,7 +63,12 @@ class ClassicMaterialHost extends ConsumerWidget {
           labelBehavior: material.NavigationDestinationLabelBehavior.alwaysShow,
         ),
       ),
-      child: material.ScaffoldMessenger(child: child),
+      child: classic
+          ? material.ScaffoldMessenger(child: child)
+          : IconTheme(
+              data: prism.Theme.of(context).iconTheme,
+              child: material.ScaffoldMessenger(child: child),
+            ),
     );
   }
 }

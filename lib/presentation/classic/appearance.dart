@@ -39,22 +39,18 @@ class ClassicAppearance extends ConsumerWidget {
           ),
           const Divider(),
           ListTile(title: Text(l.themeMode)),
-          for (final mode in prism.ThemeMode.values)
-            RadioListTile<prism.ThemeMode>(
-              value: mode,
-              groupValue: settings.themeMode,
-              title: Text(switch (mode) {
-                prism.ThemeMode.system => l.auto,
-                prism.ThemeMode.light => l.light,
-                prism.ThemeMode.dark => l.dark,
-              }),
-              onChanged: (value) {
-                if (value != null)
-                  ref
-                      .read(themeSettingProvider.notifier)
-                      .update((s) => s.copyWith(themeMode: value));
-              },
-            ),
+          ClassicRadioChoices<prism.ThemeMode>(
+            value: settings.themeMode,
+            options: prism.ThemeMode.values,
+            label: (mode) => switch (mode) {
+              prism.ThemeMode.system => l.auto,
+              prism.ThemeMode.light => l.light,
+              prism.ThemeMode.dark => l.dark,
+            },
+            onChanged: (value) => ref
+                .read(themeSettingProvider.notifier)
+                .update((s) => s.copyWith(themeMode: value)),
+          ),
           SwitchListTile(
             title: Text(l.pureBlack),
             value: settings.pureBlack,

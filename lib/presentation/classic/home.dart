@@ -30,6 +30,31 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
   final _visited = <int>{0};
   final _keys = List.generate(7, (_) => GlobalKey<NavigatorState>());
 
+  @override
+  void initState() {
+    super.initState();
+    _index = switch (ref.read(currentPageLabelProvider)) {
+      PageLabel.proxies => 1,
+      PageLabel.profiles => 2,
+      PageLabel.tools => 3,
+      PageLabel.requests => 4,
+      PageLabel.logs => 6,
+      _ => 0,
+    };
+    _visited.add(_index);
+    ref.listenManual(currentPageLabelProvider, (_, next) {
+      final index = switch (next) {
+        PageLabel.proxies => 1,
+        PageLabel.profiles => 2,
+        PageLabel.tools => 3,
+        PageLabel.requests => _index == 5 ? 5 : 4,
+        PageLabel.logs => 6,
+        _ => 0,
+      };
+      if (mounted && index != _index) _select(index);
+    });
+  }
+
   void _select(int value) {
     if (value == _index) return;
     setState(() {
@@ -50,6 +75,10 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
     if (await (_keys[_index].currentState?.maybePop() ?? Future.value(false)))
       return;
     if (!mounted) return;
+    if (MediaQuery.sizeOf(context).width <= 600 && _index >= 4) {
+      _select(3);
+      return;
+    }
     if (app.system.isTV && _index != 0) {
       _select(0);
       return;
@@ -59,6 +88,7 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(currentPageLabelProvider);
     final l = AppLocalizations.of(context);
     final mobile = MediaQuery.sizeOf(context).width <= 600;
     final hasProxies = ref.watch(profilesProvider.select((s) => s.isNotEmpty));

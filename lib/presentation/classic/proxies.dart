@@ -41,9 +41,8 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
       }
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -179,7 +178,7 @@ class _ClassicGroupTabsState extends ConsumerState<_ClassicGroupTabs>
   String get activeGroupName => widget.groups[_controller.index].name;
   ScrollController _scrollOf(String name) =>
       _scrolls.putIfAbsent(name, ScrollController.new);
-  void locate(String selected) {
+  void locate(String? selected) {
     final group = widget.groups[_controller.index];
     final index = group.all.indexWhere((proxy) => proxy.name == selected);
     final scroll = _scrollOf(group.name);
@@ -380,9 +379,8 @@ class _ProxyTile extends ConsumerWidget {
                           : delay <= 0
                           ? l.timeout
                           : '$delay ms',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelSmall?.copyWith(color: delayColor),
+                      style: Theme.of(context).textTheme.labelSmall
+                          ?.copyWith(color: delayColor),
                     ),
                 ],
               ),
@@ -431,19 +429,16 @@ class ClassicProxySettings extends ConsumerWidget {
             ),
           ),
           ListTile(title: Text(l.sort)),
-          for (final type in ProxiesSortType.values)
-            RadioListTile<ProxiesSortType>(
-              title: Text(switch (type) {
-                ProxiesSortType.none => l.defaultText,
-                ProxiesSortType.delay => l.delay,
-                ProxiesSortType.name => l.name,
-              }),
-              value: type,
-              groupValue: style.sortType,
-              onChanged: (value) {
-                if (value != null) update(style.copyWith(sortType: value));
-              },
-            ),
+          ClassicRadioChoices<ProxiesSortType>(
+            value: style.sortType,
+            options: ProxiesSortType.values,
+            label: (type) => switch (type) {
+              ProxiesSortType.none => l.defaultText,
+              ProxiesSortType.delay => l.delay,
+              ProxiesSortType.name => l.name,
+            },
+            onChanged: (value) => update(style.copyWith(sortType: value)),
+          ),
           SwitchListTile(
             title: Text(l.hideTimeoutProxies),
             value: style.hideTimeoutProxies,
@@ -451,29 +446,23 @@ class ClassicProxySettings extends ConsumerWidget {
                 update(style.copyWith(hideTimeoutProxies: value)),
           ),
           ListTile(title: Text(l.layout)),
-          for (final layout in ProxiesLayout.values)
-            RadioListTile<ProxiesLayout>(
-              value: layout,
-              groupValue: style.layout,
-              title: Text(switch (layout) {
-                ProxiesLayout.tight => l.tight,
-                ProxiesLayout.standard => l.standard,
-                ProxiesLayout.loose => l.loose,
-              }),
-              onChanged: (value) {
-                if (value != null) update(style.copyWith(layout: value));
-              },
-            ),
+          ClassicRadioChoices<ProxiesLayout>(
+            value: style.layout,
+            options: ProxiesLayout.values,
+            label: (layout) => switch (layout) {
+              ProxiesLayout.tight => l.tight,
+              ProxiesLayout.standard => l.standard,
+              ProxiesLayout.loose => l.loose,
+            },
+            onChanged: (value) => update(style.copyWith(layout: value)),
+          ),
           ListTile(title: Text(l.size)),
-          for (final type in ProxyCardType.values)
-            RadioListTile<ProxyCardType>(
-              title: Text(type.name),
-              value: type,
-              groupValue: style.cardType,
-              onChanged: (value) {
-                if (value != null) update(style.copyWith(cardType: value));
-              },
-            ),
+          ClassicRadioChoices<ProxyCardType>(
+            value: style.cardType,
+            options: ProxyCardType.values,
+            label: (type) => type.name,
+            onChanged: (value) => update(style.copyWith(cardType: value)),
+          ),
         ],
       ),
     );
