@@ -12,11 +12,13 @@ class ClassicCard extends StatelessWidget {
     required this.icon,
     required this.child,
     this.onTap,
+    this.trailing,
   });
   final String title;
   final IconData icon;
   final Widget child;
   final VoidCallback? onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +47,7 @@ class ClassicCard extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ),
+                  if (trailing != null) trailing!,
                 ],
               ),
               const SizedBox(height: 8),
@@ -123,12 +126,14 @@ class ClassicTrafficChart extends StatelessWidget {
     super.key,
     required this.values,
     required this.color,
+    this.height = 54,
   });
+  final double height;
   final List<double> values;
   final Color color;
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: 54,
+    height: height,
     width: double.infinity,
     child: CustomPaint(painter: _TrafficPainter(values, color)),
   );
@@ -140,12 +145,13 @@ class _TrafficPainter extends CustomPainter {
   final Color color;
   @override
   void paint(Canvas canvas, Size size) {
-    if (values.length < 2 || size.isEmpty) return;
-    final peak = values.fold<double>(1, (a, b) => a > b ? a : b);
+    if (size.isEmpty) return;
+    final samples = values.length < 2 ? [0.0, 0.0] : values;
+    final peak = samples.fold<double>(1, (a, b) => a > b ? a : b);
     final line = Path();
-    for (var i = 0; i < values.length; i++) {
-      final x = size.width * i / (values.length - 1);
-      final y = size.height * (1 - values[i] / peak);
+    for (var i = 0; i < samples.length; i++) {
+      final x = size.width * i / (samples.length - 1);
+      final y = size.height * (1 - samples[i] / peak);
       if (i == 0) {
         line.moveTo(x, y);
       } else {

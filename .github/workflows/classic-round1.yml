@@ -402,6 +402,7 @@ jobs:
     if: github.repository == 'iqonli/FlClash_PE'
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - platform: android
@@ -445,8 +446,14 @@ jobs:
 
       - name: Setup Android Signing
         if: startsWith(matrix.platform,'android')
+        env:
+          CLASSIC_SIGNING_KEYSTORE: ${{ secrets.KEYSTORE }}
         run: |
-          echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
+          if [ -z "$CLASSIC_SIGNING_KEYSTORE" ]; then
+            echo "No release keystore configured; build a separate .dev application."
+            exit 0
+          fi
+          printf '%s' "$CLASSIC_SIGNING_KEYSTORE" | base64 --decode > android/app/keystore.jks
           {
             echo "keyAlias=${{ secrets.KEY_ALIAS }}"
             echo "storePassword=${{ secrets.STORE_PASSWORD }}"

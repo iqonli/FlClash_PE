@@ -42,11 +42,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           .read(setupActionProvider.notifier)
           .setRunning(!ref.read(isStartProvider));
     } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
-      }
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -88,9 +86,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final columns = (constraints.maxWidth / 280).ceil().clamp(2, 8);
-          final scale = MediaQuery.textScalerOf(
-            context,
-          ).scale(1).clamp(1.0, 3.0);
+          final scale = MediaQuery.textScalerOf(context)
+              .scale(1)
+              .clamp(1.0, 3.0);
           final width =
               (constraints.maxWidth - 32 - classicGap * (columns - 1)) /
               columns;
@@ -156,36 +154,29 @@ class _DashboardCard extends ConsumerWidget {
         return ClassicCard(
           title: l.networkSpeed,
           icon: Icons.speed,
-          child: Row(
+          trailing: Text(
+            '${classicBytes(latest.up + latest.down)}/s',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          child: Column(
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('↑ ${classicBytes(latest.up)}/s', style: style),
-                    ClassicTrafficChart(
-                      values: [
-                        for (final sample in traffic) sample.up.toDouble(),
-                      ],
-                      color: color,
-                    ),
+                child: ClassicTrafficChart(
+                  height: double.infinity,
+                  values: [
+                    for (final sample in traffic)
+                      (sample.up + sample.down).toDouble(),
                   ],
+                  color: color,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('↓ ${classicBytes(latest.down)}/s', style: style),
-                    ClassicTrafficChart(
-                      values: [
-                        for (final sample in traffic) sample.down.toDouble(),
-                      ],
-                      color: color,
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text('↑ ${classicBytes(latest.up)}/s'),
+                  Text('↓ ${classicBytes(latest.down)}/s'),
+                ],
               ),
             ],
           ),
@@ -211,9 +202,8 @@ class _DashboardCard extends ConsumerWidget {
           child: RadioGroup<Mode>(
             groupValue: mode,
             onChanged: (value) {
-              if (value != null) {
+              if (value != null)
                 ref.read(setupActionProvider.notifier).changeMode(value);
-              }
             },
             child: Column(
               children: [
@@ -263,11 +253,11 @@ class _DashboardCard extends ConsumerWidget {
             child: Switch(
               value: value,
               onChanged: (next) {
-                if (id == 'systemProxy') {
+                if (id == 'systemProxy')
                   ref
                       .read(networkSettingProvider.notifier)
                       .update((s) => s.copyWith(systemProxy: next));
-                } else if (id == 'vpn')
+                else if (id == 'vpn')
                   ref
                       .read(vpnSettingProvider.notifier)
                       .update((s) => s.copyWith(enable: next));
@@ -444,7 +434,7 @@ class _ClassicNetworkDetectionState
     final l = AppLocalizations.of(context);
     final hidden = ref.watch(appSettingProvider.select((s) => s.hideIp));
     return ClassicCard(
-      title: l.network,
+      title: l.networkDetection,
       icon: Icons.network_check,
       onTap: () => _probe.refresh(const [routedOutbound]),
       child: state.isLoading

@@ -21,6 +21,7 @@ import '../helpers/test_profiles.dart';
 
 void main() {
   setUpAll(() async {
+    debugDisableShadows = false;
     await (FontLoader(
       'MaterialIcons',
     )..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'))).load();
