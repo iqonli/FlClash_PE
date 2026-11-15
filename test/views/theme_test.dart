@@ -231,6 +231,9 @@ void main() {
         200,
         scrollable: find.byType(Scrollable).first,
       );
+      // A target may be built while still below the viewport after scrolling.
+      await tester.ensureVisible(find.byTooltip('Add'));
+      await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Add'));
       await tester.pumpAndSettle();
 

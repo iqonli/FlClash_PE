@@ -18,7 +18,6 @@ class ClassicProxies extends ConsumerStatefulWidget {
 
 class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
   final _search = TextEditingController();
-  final _scroll = ScrollController();
   final _tabsKey = GlobalKey<_ClassicGroupTabsState>();
   bool _searching = false;
   String? _group;
@@ -26,7 +25,6 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
   @override
   void dispose() {
     _search.dispose();
-    _scroll.dispose();
     super.dispose();
   }
 
@@ -78,7 +76,6 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
             },
           )
         : CustomScrollView(
-            controller: _scroll,
             slivers: [
               for (final group in groups) ...[
                 SliverToBoxAdapter(
