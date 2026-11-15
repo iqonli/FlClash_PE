@@ -28,6 +28,9 @@ const _groupFloors = <String, double>{
   'common': 74.0,
   'manager': 68.0,
   'views': 66.0,
+  // Round-1 presentation code starts at 43.7% measured coverage.
+  // Keep its own non-zero floor so it cannot be masked by other groups.
+  'presentation': 43.0,
   'enum': 86.0,
   'pages': 71.0,
   'plugins': 67.0,
