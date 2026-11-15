@@ -1,7 +1,9 @@
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/common/common.dart' as app;
 import 'package:fl_clash/common/l10n_labels.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/state.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/proxies/card.dart' show selectGroupProxy;
 import 'package:flutter/material.dart';
@@ -41,11 +43,9 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
         await action.delayTestGroups(groups);
       }
     } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
-      }
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -64,7 +64,11 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
         ? _ClassicGroupTabs(
             key: _tabsKey,
             groups: groups,
-            selected: _group,
+            selected:
+                _group ??
+                ref.watch(
+                  currentProfileProvider.select((s) => s?.currentGroupName),
+                ),
             onSelected: (name) {
               _group = name;
               ref
@@ -102,11 +106,10 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
             icon: const Icon(Icons.adjust),
             onPressed: () {
               final tabs = _tabsKey.currentState;
-              if (tabs != null) {
+              if (tabs != null)
                 tabs.locate(
                   ref.read(selectedProxyNameProvider(tabs.activeGroupName)),
                 );
-              }
             },
           ),
         IconButton(
@@ -221,9 +224,8 @@ class _ClassicGroupTabsState extends ConsumerState<_ClassicGroupTabs>
   }
 
   void _changed() {
-    if (!_controller.indexIsChanging) {
+    if (!_controller.indexIsChanging)
       widget.onSelected(widget.groups[_controller.index].name);
-    }
   }
 
   @override
@@ -311,6 +313,71 @@ class _ProxyTile extends ConsumerWidget {
   const _ProxyTile({required this.group, required this.proxy});
   final Group group;
   final Proxy proxy;
+  Future<void> _menu(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final custom = ref.read(currentProfileProvider)?.type == ProfileType.custom;
+    final addable =
+        (proxy.providerName != null || !custom) &&
+        !app.reservedCustomProxyNames.contains(proxy.name) &&
+        GroupTypeExtension.getGroupType(proxy.type) == null;
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (group.type == GroupType.Selector ||
+                group.type.isComputedSelected)
+              ListTile(
+                leading: Icon(
+                  group.type.isComputedSelected
+                      ? Icons.push_pin
+                      : Icons.check_circle,
+                ),
+                title: Text(
+                  group.type.isComputedSelected ? l.preferred : l.select,
+                ),
+                onTap: () => Navigator.pop(context, 'select'),
+              ),
+            ListTile(
+              leading: const Icon(Icons.bolt),
+              title: Text(l.delayTest),
+              onTap: () => Navigator.pop(context, 'test'),
+            ),
+            if (addable)
+              ListTile(
+                leading: const Icon(Icons.playlist_add),
+                title: Text(l.addToLocalProxies),
+                onTap: () => Navigator.pop(context, 'add'),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (!context.mounted || choice == null) return;
+    if (choice == 'select') {
+      selectGroupProxy(
+        ref,
+        groupName: group.name,
+        groupType: group.type,
+        proxyName: proxy.name,
+      );
+    } else if (choice == 'test') {
+      await globalState.safeRun(
+        () => ref.read(proxiesActionProvider.notifier).delayTest([
+          proxy,
+        ], group.testUrl),
+      );
+    } else if (choice == 'add') {
+      await globalState.safeRun(
+        () => ref
+            .read(proxiesActionProvider.notifier)
+            .addToLocalProxies(proxy.name),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selected =
@@ -350,9 +417,8 @@ class _ProxyTile extends ConsumerWidget {
           groupType: group.type,
           proxyName: proxy.name,
         ),
-        onLongPress: () => ref.read(proxiesActionProvider.notifier).delayTest([
-          proxy,
-        ], group.testUrl),
+        onLongPress: () => _menu(context, ref),
+        onSecondaryTap: () => _menu(context, ref),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -388,9 +454,8 @@ class _ProxyTile extends ConsumerWidget {
                           : delay <= 0
                           ? l.timeout
                           : '$delay ms',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelSmall?.copyWith(color: delayColor),
+                      style: Theme.of(context).textTheme.labelSmall
+                          ?.copyWith(color: delayColor),
                     ),
                 ],
               ),

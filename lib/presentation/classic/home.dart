@@ -7,6 +7,8 @@ import 'package:fl_clash/views/config/general.dart';
 import 'package:fl_clash/views/config/advanced.dart';
 import 'package:fl_clash/views/backup_and_restore.dart';
 import 'package:fl_clash/views/about.dart';
+import 'package:fl_clash/views/developer.dart';
+import 'package:fl_clash/views/disclaimer.dart';
 import 'package:fl_clash/views/hotkey.dart';
 import 'package:fl_clash/views/access.dart';
 import 'package:prism_ui/prism_ui.dart' as prism;
@@ -28,7 +30,7 @@ class ClassicHome extends ConsumerStatefulWidget {
 class _ClassicHomeState extends ConsumerState<ClassicHome> {
   int _index = 0;
   final _visited = <int>{0};
-  final _keys = List.generate(7, (_) => GlobalKey<NavigatorState>());
+  final _keys = List.generate(9, (_) => GlobalKey<NavigatorState>());
 
   @override
   void initState() {
@@ -39,6 +41,8 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
       PageLabel.tools => 3,
       PageLabel.requests => 4,
       PageLabel.logs => 6,
+      PageLabel.dns => 7,
+      PageLabel.resources => 8,
       _ => 0,
     };
     _visited.add(_index);
@@ -49,6 +53,8 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
         PageLabel.tools => 3,
         PageLabel.requests => _index == 5 ? 5 : 4,
         PageLabel.logs => 6,
+        PageLabel.dns => 7,
+        PageLabel.resources => 8,
         _ => 0,
       };
       if (mounted && index != _index) _select(index);
@@ -67,14 +73,15 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
       2 => PageLabel.profiles,
       4 || 5 => PageLabel.requests,
       6 => PageLabel.logs,
+      7 => PageLabel.dns,
+      8 => PageLabel.resources,
       _ => PageLabel.tools,
     });
   }
 
   Future<void> _back() async {
-    if (await (_keys[_index].currentState?.maybePop() ?? Future.value(false))) {
+    if (await (_keys[_index].currentState?.maybePop() ?? Future.value(false)))
       return;
-    }
     if (!mounted) return;
     if (MediaQuery.sizeOf(context).width <= 600 && _index >= 4) {
       _select(3);
@@ -102,6 +109,8 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
       l.requests,
       l.connections,
       l.logs,
+      l.dns,
+      l.resources,
     ];
     const icons = [
       Icons.space_dashboard,
@@ -111,6 +120,8 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
       Icons.view_timeline,
       Icons.ballot,
       Icons.adb,
+      Icons.dns,
+      Icons.storage,
     ];
     final destinations = [
       0,
@@ -129,6 +140,8 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
       (_) => const modern.RequestsView(initialFeed: RequestFeed.recent),
       (_) => const modern.RequestsView(initialFeed: RequestFeed.live),
       (_) => const modern.LogsView(),
+      (_) => const modern.DnsQueriesView(),
+      (_) => const modern.ResourcesView(),
     ];
     final body = IndexedStack(
       index: selected,
@@ -268,7 +281,16 @@ class ClassicTools extends ConsumerWidget {
               title: Text(l.logs),
               onTap: () => onSelect(6),
             ),
-          row(l.resources, Icons.storage, const modern.ResourcesView()),
+          ListTile(
+            leading: const Icon(Icons.dns),
+            title: Text(l.dns),
+            onTap: () => onSelect(7),
+          ),
+          ListTile(
+            leading: const Icon(Icons.storage),
+            title: Text(l.resources),
+            onTap: () => onSelect(8),
+          ),
           const Divider(),
           ListTile(
             title: Text(
@@ -284,6 +306,15 @@ class ClassicTools extends ConsumerWidget {
               builder: (context) => SimpleDialog(
                 title: Text(l.language),
                 children: [
+                  SimpleDialogOption(
+                    child: Text(l.defaultText),
+                    onPressed: () {
+                      ref
+                          .read(appSettingProvider.notifier)
+                          .update((s) => s.copyWith(locale: null));
+                      Navigator.pop(context);
+                    },
+                  ),
                   for (final locale
                       in AppLocalizations.delegate.supportedLocales)
                     SimpleDialogOption(
@@ -314,6 +345,9 @@ class ClassicTools extends ConsumerWidget {
           row(l.advancedConfig, Icons.tune, const AdvancedConfigView()),
           row(l.settings, Icons.settings_outlined, const GeneralView()),
           const Divider(),
+          row(l.disclaimer, Icons.description_outlined, const DisclaimerView()),
+          if (ref.watch(appSettingProvider.select((s) => s.developerMode)))
+            row(l.developerMode, Icons.code, const DeveloperView()),
           row(l.about, Icons.info_outline, const AboutView()),
         ],
       ),

@@ -31,7 +31,7 @@ void main() {
       await loader.load();
     }
   });
-  for (final width in [412.0, 1280.0]) {
+  for (final width in [360.0, 412.0, 600.0, 601.0, 800.0, 1280.0]) {
     testWidgets('classic shell navigation and rendering at $width dp', (
       tester,
     ) async {
