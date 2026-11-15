@@ -72,8 +72,9 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
   }
 
   Future<void> _back() async {
-    if (await (_keys[_index].currentState?.maybePop() ?? Future.value(false)))
+    if (await (_keys[_index].currentState?.maybePop() ?? Future.value(false))) {
       return;
+    }
     if (!mounted) return;
     if (MediaQuery.sizeOf(context).width <= 600 && _index >= 4) {
       _select(3);
