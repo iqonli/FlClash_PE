@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/presentation/classic/components.dart';
 import 'package:fl_clash/presentation/classic/dashboard.dart';
@@ -18,7 +20,7 @@ void main() {
       'classicDashboard': ['traffic', 'mode'],
       'dashboardWidgets': ['currentOutbound', 'profiles'],
     });
-    final restored = AppSettingProps.fromJson(original.toJson());
+    final restored = AppSettingProps.fromJson(jsonDecode(jsonEncode(original)));
     expect(restored.classicUi, isTrue);
     expect(restored.classicDashboard, ['traffic', 'mode']);
     expect(restored.dashboardWidgets, original.dashboardWidgets);
@@ -92,7 +94,9 @@ void main() {
         isFalse,
       );
       expect(container.read(appSettingProvider).dashboardWidgets, modern);
-      final json = container.read(appSettingProvider).toJson();
+      final json = jsonDecode(
+        jsonEncode(container.read(appSettingProvider)),
+      ) as Map<String, dynamic>;
       expect(
         AppSettingProps.fromJson(json).classicDashboard.contains('speed'),
         isFalse,

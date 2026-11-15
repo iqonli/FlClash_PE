@@ -42,11 +42,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           .read(setupActionProvider.notifier)
           .setRunning(!ref.read(isStartProvider));
     } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
-      }
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -108,9 +106,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
                     key: ValueKey(id),
                     height:
                         180 *
-                        MediaQuery.textScalerOf(
-                          context,
-                        ).scale(1).clamp(1.0, 3.0),
+                        MediaQuery.textScalerOf(context)
+                            .scale(1)
+                            .clamp(1.0, 3.0),
                     width: id == 'speed' && columns > 1
                         ? width * 2 + classicGap
                         : width,
@@ -198,6 +196,8 @@ class _DashboardCard extends ConsumerWidget {
               for (final value in Mode.values)
                 ChoiceChip(
                   label: Text(value.label),
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   selected: value == mode,
                   onSelected: (_) =>
                       ref.read(setupActionProvider.notifier).changeMode(value),
@@ -227,11 +227,11 @@ class _DashboardCard extends ConsumerWidget {
             child: Switch(
               value: value,
               onChanged: (next) {
-                if (id == 'systemProxy') {
+                if (id == 'systemProxy')
                   ref
                       .read(networkSettingProvider.notifier)
                       .update((s) => s.copyWith(systemProxy: next));
-                } else if (id == 'vpn')
+                else if (id == 'vpn')
                   ref
                       .read(vpnSettingProvider.notifier)
                       .update((s) => s.copyWith(enable: next));
@@ -343,9 +343,17 @@ class ClassicDashboardEditor extends ConsumerWidget {
       'vpn': 'VPN',
       'networkDetection': l.network,
     };
+    // Keep controls unavailable on this platform when a shared backup is edited.
     void save(List<String> value) => ref
         .read(appSettingProvider.notifier)
-        .update((s) => s.copyWith(classicDashboard: value));
+        .update(
+          (s) => s.copyWith(
+            classicDashboard: [
+              ...value,
+              ...saved.where((id) => !_available(id) || !_desktopCard(id)),
+            ],
+          ),
+        );
     return ClassicPage(
       title: l.classicDashboardLayout,
       body: ReorderableListView.builder(
