@@ -43,9 +43,8 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           .setRunning(!ref.read(isStartProvider));
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -107,9 +106,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
                     key: ValueKey(id),
                     height:
                         180 *
-                        MediaQuery.textScalerOf(
-                          context,
-                        ).scale(1).clamp(1.0, 3.0),
+                        MediaQuery.textScalerOf(context)
+                            .scale(1)
+                            .clamp(1.0, 3.0),
                     width: id == 'speed' && columns > 1
                         ? width * 2 + classicGap
                         : width,
@@ -244,6 +243,7 @@ class _DashboardCard extends ConsumerWidget {
         );
       case 'network':
         final ip = ref.watch(localIpProvider);
+        final hidden = ref.watch(appSettingProvider.select((s) => s.hideIp));
         final profile = ref.watch(currentProfileProvider);
         return ClassicCard(
           title: l.intranetIP,
@@ -251,7 +251,10 @@ class _DashboardCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SelectableText(ip ?? l.connecting, style: style),
+              SelectableText(
+                hidden ? '••••' : ip ?? l.connecting,
+                style: style,
+              ),
               const SizedBox(height: 8),
               Text(profile?.realLabel ?? l.nullProfileDesc),
             ],
@@ -395,6 +398,7 @@ class _ClassicNetworkDetectionState
       outboundIpProbeProvider.select((s) => s.entryOf(routedOutbound)),
     );
     final l = AppLocalizations.of(context);
+    final hidden = ref.watch(appSettingProvider.select((s) => s.hideIp));
     return ClassicCard(
       title: l.network,
       icon: Icons.network_check,
@@ -408,7 +412,7 @@ class _ClassicNetworkDetectionState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SelectableText(
-                  state.value?.ip ?? l.timeout,
+                  hidden ? '••••' : state.value?.ip ?? l.timeout,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),

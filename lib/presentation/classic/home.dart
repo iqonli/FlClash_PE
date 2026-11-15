@@ -140,30 +140,31 @@ class _ClassicHomeState extends ConsumerState<ClassicHome> {
                     children: [
                       const SizedBox(height: 16),
                       if (!app.system.isMacOS)
-                        const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: Icon(Icons.shield, size: 40),
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Image.asset(
+                            'assets/images/icon.png',
+                            width: 40,
+                            height: 40,
+                          ),
                         ),
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: IntrinsicHeight(
-                            child: NavigationRail(
-                              selectedIndex: destinations.indexOf(navSelected),
-                              labelType: expanded
-                                  ? NavigationRailLabelType.all
-                                  : NavigationRailLabelType.none,
-                              backgroundColor: Colors.transparent,
-                              destinations: [
-                                for (final i in destinations)
-                                  NavigationRailDestination(
-                                    icon: Icon(icons[i]),
-                                    label: Text(labels[i]),
-                                  ),
-                              ],
-                              onDestinationSelected: (i) =>
-                                  _select(destinations[i]),
-                            ),
-                          ),
+                        child: NavigationRail(
+                          scrollable: true,
+                          selectedIndex: destinations.indexOf(navSelected),
+                          labelType: expanded
+                              ? NavigationRailLabelType.all
+                              : NavigationRailLabelType.none,
+                          backgroundColor: Colors.transparent,
+                          destinations: [
+                            for (final i in destinations)
+                              NavigationRailDestination(
+                                icon: Icon(icons[i]),
+                                label: Text(labels[i]),
+                              ),
+                          ],
+                          onDestinationSelected: (i) =>
+                              _select(destinations[i]),
                         ),
                       ),
                       IconButton(

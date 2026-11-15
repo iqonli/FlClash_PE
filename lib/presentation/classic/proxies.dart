@@ -17,6 +17,7 @@ class ClassicProxies extends ConsumerStatefulWidget {
 class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
   final _search = TextEditingController();
   final _scroll = ScrollController();
+  final _tabsKey = GlobalKey<_ClassicGroupTabsState>();
   bool _searching = false;
   String? _group;
 
@@ -40,9 +41,8 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
       }
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -59,6 +59,7 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
         ? Center(child: Text(l.nullTip(l.proxies)))
         : tab
         ? _ClassicGroupTabs(
+            key: _tabsKey,
             groups: groups,
             selected: _group,
             onSelected: (name) {
@@ -92,6 +93,18 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
     return ClassicPage(
       title: l.proxies,
       actions: [
+        if (tab)
+          IconButton(
+            tooltip: l.scrollToSelected,
+            icon: const Icon(Icons.adjust),
+            onPressed: () {
+              final tabs = _tabsKey.currentState;
+              if (tabs != null)
+                tabs.locate(
+                  ref.read(selectedProxyNameProvider(tabs.activeGroupName)),
+                );
+            },
+          ),
         IconButton(
           tooltip: l.search,
           icon: const Icon(Icons.search),
@@ -144,8 +157,9 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
   }
 }
 
-class _ClassicGroupTabs extends StatefulWidget {
+class _ClassicGroupTabs extends ConsumerStatefulWidget {
   const _ClassicGroupTabs({
+    super.key,
     required this.groups,
     required this.selected,
     required this.onSelected,
@@ -154,12 +168,37 @@ class _ClassicGroupTabs extends StatefulWidget {
   final String? selected;
   final ValueChanged<String> onSelected;
   @override
-  State<_ClassicGroupTabs> createState() => _ClassicGroupTabsState();
+  ConsumerState<_ClassicGroupTabs> createState() => _ClassicGroupTabsState();
 }
 
-class _ClassicGroupTabsState extends State<_ClassicGroupTabs>
+class _ClassicGroupTabsState extends ConsumerState<_ClassicGroupTabs>
     with SingleTickerProviderStateMixin {
   late TabController _controller;
+  final _scrolls = <String, ScrollController>{};
+  String get activeGroupName => widget.groups[_controller.index].name;
+  ScrollController _scrollOf(String name) =>
+      _scrolls.putIfAbsent(name, ScrollController.new);
+  void locate(String selected) {
+    final group = widget.groups[_controller.index];
+    final index = group.all.indexWhere((proxy) => proxy.name == selected);
+    final scroll = _scrollOf(group.name);
+    if (index < 0 || !scroll.hasClients) return;
+    final style = ref.read(proxiesStyleSettingProvider);
+    final width = context.size?.width ?? MediaQuery.sizeOf(context).width;
+    final columns = ((width - 16) / _columnWidth(style.layout)).floor().clamp(
+      1,
+      8,
+    );
+    final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 3.0);
+    final offset =
+        16 + (index ~/ columns) * (_cardHeight(style.cardType) * scale + 8);
+    scroll.animateTo(
+      offset.clamp(0, scroll.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -197,6 +236,9 @@ class _ClassicGroupTabsState extends State<_ClassicGroupTabs>
 
   @override
   void dispose() {
+    for (final scroll in _scrolls.values) {
+      scroll.dispose();
+    }
     _controller.removeListener(_changed);
     _controller.dispose();
     super.dispose();
@@ -217,6 +259,7 @@ class _ClassicGroupTabsState extends State<_ClassicGroupTabs>
             for (final group in widget.groups)
               CustomScrollView(
                 key: PageStorageKey(group.name),
+                controller: _scrollOf(group.name),
                 slivers: [
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(8, 16, 8, 104),
@@ -236,22 +279,16 @@ class _ProxyGridSliver extends ConsumerWidget {
   final Group group;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cardType = ref.watch(
-      proxiesStyleSettingProvider.select((s) => s.cardType),
-    );
-    final height = switch (cardType) {
-      ProxyCardType.compact => 76.0,
-      ProxyCardType.standard => 96.0,
-      ProxyCardType.loose => 116.0,
-    };
+    final style = ref.watch(proxiesStyleSettingProvider);
+    final height = _cardHeight(style.cardType);
     final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 3.0);
     return SliverLayoutBuilder(
       builder: (context, constraints) => SliverGrid(
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: (constraints.crossAxisExtent / 180).floor().clamp(
-            1,
-            8,
-          ),
+          crossAxisCount:
+              (constraints.crossAxisExtent / _columnWidth(style.layout))
+                  .floor()
+                  .clamp(1, 8),
           mainAxisSpacing: 8,
           crossAxisSpacing: 8,
           mainAxisExtent: height * scale,
@@ -342,9 +379,8 @@ class _ProxyTile extends ConsumerWidget {
                           : delay <= 0
                           ? l.timeout
                           : '$delay ms',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelSmall?.copyWith(color: delayColor),
+                      style: Theme.of(context).textTheme.labelSmall
+                          ?.copyWith(color: delayColor),
                     ),
                 ],
               ),
@@ -412,6 +448,20 @@ class ClassicProxySettings extends ConsumerWidget {
             onChanged: (value) =>
                 update(style.copyWith(hideTimeoutProxies: value)),
           ),
+          ListTile(title: Text(l.layout)),
+          for (final layout in ProxiesLayout.values)
+            RadioListTile<ProxiesLayout>(
+              value: layout,
+              groupValue: style.layout,
+              title: Text(switch (layout) {
+                ProxiesLayout.tight => l.tight,
+                ProxiesLayout.standard => l.standard,
+                ProxiesLayout.loose => l.loose,
+              }),
+              onChanged: (value) {
+                if (value != null) update(style.copyWith(layout: value));
+              },
+            ),
           ListTile(title: Text(l.size)),
           for (final type in ProxyCardType.values)
             RadioListTile<ProxyCardType>(
@@ -427,3 +477,15 @@ class ClassicProxySettings extends ConsumerWidget {
     );
   }
 }
+
+double _columnWidth(ProxiesLayout layout) => switch (layout) {
+  ProxiesLayout.tight => 150,
+  ProxiesLayout.standard => 180,
+  ProxiesLayout.loose => 220,
+};
+
+double _cardHeight(ProxyCardType type) => switch (type) {
+  ProxyCardType.compact => 76,
+  ProxyCardType.standard => 96,
+  ProxyCardType.loose => 116,
+};

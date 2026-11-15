@@ -156,6 +156,9 @@ class ApplicationState extends ConsumerState<Application> {
         );
         final themeProps = ref.watch(themeSettingProvider);
         final textScale = themeProps.textScale;
+        final classic = ref.watch(
+          appSettingProvider.select((s) => s.classicUi),
+        );
         return PrismApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: globalState.navigatorKey,
@@ -184,11 +187,13 @@ class ApplicationState extends ConsumerState<Application> {
           textScale: textScale.enable ? textScale.scale : null,
           minTextScale: minTextScale,
           maxTextScale: maxTextScale,
-          liquidGlass: switch (themeProps.liquidGlass) {
-            LiquidGlassMode.none => null,
-            LiquidGlassMode.ultra => LiquidGlassQuality.ultra,
-            LiquidGlassMode.standard => LiquidGlassQuality.standard,
-          },
+          liquidGlass: classic
+              ? null
+              : switch (themeProps.liquidGlass) {
+                  LiquidGlassMode.none => null,
+                  LiquidGlassMode.ultra => LiquidGlassQuality.ultra,
+                  LiquidGlassMode.standard => LiquidGlassQuality.standard,
+                },
           emojiFont: (family: FontFamily.twEmoji.value, pattern: emojiPattern),
           stackedBanners: !ref.watch(isMobileViewProvider),
           bannerTopInset: ref.watch(overlayTopOffsetProvider),

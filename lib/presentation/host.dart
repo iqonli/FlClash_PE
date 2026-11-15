@@ -1,4 +1,5 @@
 import 'package:fl_clash/pages/home.dart';
+import 'package:animations/animations.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/ui/ui.dart' as prism;
@@ -37,6 +38,22 @@ class ClassicMaterialHost extends ConsumerWidget {
     return material.Theme(
       data: material.ThemeData(
         useMaterial3: true,
+        pageTransitionsTheme: const material.PageTransitionsTheme(
+          builders: {
+            material.TargetPlatform.android: SharedAxisPageTransitionsBuilder(
+              transitionType: SharedAxisTransitionType.horizontal,
+            ),
+            material.TargetPlatform.windows: SharedAxisPageTransitionsBuilder(
+              transitionType: SharedAxisTransitionType.horizontal,
+            ),
+            material.TargetPlatform.linux: SharedAxisPageTransitionsBuilder(
+              transitionType: SharedAxisTransitionType.horizontal,
+            ),
+            material.TargetPlatform.macOS: SharedAxisPageTransitionsBuilder(
+              transitionType: SharedAxisTransitionType.horizontal,
+            ),
+          },
+        ),
         colorScheme: colors,
         fontFamily: settings.fontFamily,
         navigationBarTheme: const material.NavigationBarThemeData(

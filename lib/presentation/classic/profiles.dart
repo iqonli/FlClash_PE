@@ -28,9 +28,8 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
       await task();
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -204,7 +203,9 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
                 itemCount: profiles.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: (size.maxWidth / 320).floor().clamp(1, 6),
-                  mainAxisExtent: 200,
+                  mainAxisExtent:
+                      200 *
+                      MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 3.0),
                   mainAxisSpacing: classicGap,
                   crossAxisSpacing: classicGap,
                 ),
@@ -242,9 +243,9 @@ class _ClassicProfilesState extends ConsumerState<ClassicProfiles> {
                                     profile.realLabel,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium,
                                   ),
                                 ),
                                 PopupMenuButton<String>(
@@ -359,18 +360,33 @@ class _ClassicProfileFormState extends ConsumerState<ClassicProfileForm> {
       final action = ref.read(profilesActionProvider.notifier);
       final old = widget.profile;
       if (old == null) {
+        final previousIds = {
+          for (final profile in ref.read(profilesProvider)) profile.id,
+        };
         await action.addProfileFromLink(
           _url.text.trim(),
           label: _name.text.trim(),
           ageSecretKey: _key.text.trim(),
         );
+        for (final profile in ref.read(profilesProvider)) {
+          if (!previousIds.contains(profile.id) &&
+              profile.url == _url.text.trim()) {
+            action.putProfile(
+              profile.copyWith(
+                autoUpdate: _auto,
+                autoUpdateDuration: Duration(
+                  minutes: int.parse(_interval.text),
+                ),
+              ),
+            );
+          }
+        }
       } else {
         final current = ref.read(profileProvider(old.id));
         if (current == null)
           throw StateError(
-            AppLocalizations.of(
-              context,
-            ).nullTip(AppLocalizations.of(context).profile),
+            AppLocalizations.of(context)
+                .nullTip(AppLocalizations.of(context).profile),
           );
         final next = current.copyWith(
           label: _name.text.trim(),
@@ -392,9 +408,8 @@ class _ClassicProfileFormState extends ConsumerState<ClassicProfileForm> {
       }
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

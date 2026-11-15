@@ -25,6 +25,33 @@ void main() {
     expect(AppSettingProps.fromJson({}).classicUi, isFalse);
   });
 
+  test(
+    'legacy layout is captured before modern card identifiers are normalized',
+    () {
+      final restored = AppSettingProps.fromJson({
+        'dashboardWidgets': [
+          'networkSpeed',
+          'systemProxyButton',
+          'tunButton',
+          'outboundMode',
+          'networkDetection',
+          'trafficUsage',
+          'intranetIp',
+        ],
+      });
+      expect(restored.classicDashboard, [
+        'speed',
+        'systemProxy',
+        'tun',
+        'mode',
+        'networkDetection',
+        'traffic',
+        'network',
+      ]);
+      expect(restored.classicUi, isFalse);
+    },
+  );
+
   Future<void> pump(
     WidgetTester tester,
     ProviderContainer container,

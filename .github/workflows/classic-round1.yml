@@ -50,7 +50,7 @@ jobs:
         run: |
           git config user.name "IQ Online Studio"
           git config user.email "iqonli@disroot.org"
-          git add lib/models/generated lib/providers/generated lib/database/generated lib/l10n lib/presentation lib/application.dart lib/models/config.dart lib/views/theme.dart lib/common/dialog.dart test/lint test/presentation
+          git add pubspec.lock lib/models/generated lib/providers/generated lib/database/generated lib/l10n lib/presentation lib/application.dart lib/models/config.dart lib/views/theme.dart lib/common/dialog.dart test/lint test/presentation
           if ! git diff --cached --quiet; then
             git commit -m "build: regenerate classic presentation models and localization"
             git push origin HEAD:feature/classic-ui-round1
@@ -111,6 +111,14 @@ jobs:
 
       - name: Run tests
         run: dart run tool/test.dart -- --reporter expanded --coverage
+
+      - name: Upload classic UI previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: classic-ui-previews
+          path: test-output/classic-*.png
+          if-no-files-found: ignore
 
       - name: Check coverage
         run: dart run tool/check_coverage.dart coverage/lcov.info 75
