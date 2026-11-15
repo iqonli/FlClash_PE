@@ -43,8 +43,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
           .setRunning(!ref.read(isStartProvider));
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -106,9 +107,9 @@ class _ClassicDashboardState extends ConsumerState<ClassicDashboard> {
                     key: ValueKey(id),
                     height:
                         180 *
-                        MediaQuery.textScalerOf(context)
-                            .scale(1)
-                            .clamp(1.0, 3.0),
+                        MediaQuery.textScalerOf(
+                          context,
+                        ).scale(1).clamp(1.0, 3.0),
                     width: id == 'speed' && columns > 1
                         ? width * 2 + classicGap
                         : width,

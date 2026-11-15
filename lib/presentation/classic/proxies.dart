@@ -40,8 +40,9 @@ class _ClassicProxiesState extends ConsumerState<ClassicProxies> {
       }
     } catch (error) {
       if (mounted)
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('$error')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('$error')));
     }
   }
 
@@ -341,8 +342,9 @@ class _ProxyTile extends ConsumerWidget {
                           : delay <= 0
                           ? l.timeout
                           : '$delay ms',
-                      style: Theme.of(context).textTheme.labelSmall
-                          ?.copyWith(color: delayColor),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.labelSmall?.copyWith(color: delayColor),
                     ),
                 ],
               ),

@@ -19,11 +19,12 @@ _AppSettingProps _$AppSettingPropsFromJson(
 ) => _AppSettingProps(
   locale: json['locale'] as String?,
   classicUi: json['classicUi'] as bool? ?? false,
+  classicLayoutVersion: (json['classicLayoutVersion'] as num?)?.toInt() ?? 1,
   classicDashboard:
-      (json['classicDashboard'] as List<dynamic>?)
+      (_readClassicDashboard(json, 'classicDashboard') as List<dynamic>?)
           ?.map((e) => e as String)
           .toList() ??
-      const ['speed', 'mode', 'traffic', 'network', 'takeover'],
+      defaultClassicDashboard,
   dashboardWidgets: json['dashboardWidgets'] == null
       ? defaultDashboardWidgets
       : dashboardWidgetsFromJson(json['dashboardWidgets'] as List?),
@@ -107,6 +108,7 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
     <String, dynamic>{
       'locale': instance.locale,
       'classicUi': instance.classicUi,
+      'classicLayoutVersion': instance.classicLayoutVersion,
       'classicDashboard': instance.classicDashboard,
       'dashboardWidgets': instance.dashboardWidgets
           .map((e) => _$DashboardWidgetEnumMap[e]!)
